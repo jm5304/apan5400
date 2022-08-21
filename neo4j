@@ -1,0 +1,47 @@
+import pandas as pd
+from neo4j import GraphDatabase
+
+database_name = "neo4j"
+username = "neo4j"
+password = "apan5400"
+uri = "bolt://localhost:11003/" + database_name
+
+driver = GraphDatabase.driver(uri, auth=(username, password))
+
+session = driver.session()
+
+print("Successfully connected to Neo4j!")
+
+import urllib.request, json
+with urllib.request.urlopen('https://api.themoviedb.org/3/movie/popular?api_key=92cde7faffe13e0a7e1b036d22959faa&language=en-US&page=1') as url:
+    data=json.loads(url.read().decode())
+
+popular_movies=data['results']
+df=pd.DataFrame.from_dict(popular_movies)
+df.to_csv(r'popular_movies.csv',index=False, header=True)
+
+query1 = (
+    "LOAD CSV WITH HEADERS FROM 'file:///C:/Users/harry/anaconda3/5400/popular_movies.csv' AS line "
+    "CREATE (movie:Movie { \
+                       title: line.title, \
+                       vote_average: toFloat(line.vote_average)\
+                            } \
+            )"
+    "MERGE (vote_count:Vote{vote_count:toInteger(line.vote_count)})"
+    "MERGE (popularity:Popularity{popularity:toInteger(line.popularity)})"
+    "MERGE  (date:Date {date: line.release_date})"
+    "MERGE  (genre:Genre {name: line.genre_ids})"
+    "CREATE (movie)-[:released_on]->(date)"
+    "CREATE (movie)-[:with_genre]->(genre)"
+    "CREATE (movie)-[:has_vote_count] -> (vote_count) - [:affects] -> (popularity)"
+    )
+
+result1 = session.run(query1)
+print("All companies are imported from a csv file!")
+
+result12 = session.run("MATCH (n) RETURN n as nodes")
+[record["nodes"] for record in result12]
+
+query = ("MATCH (n) DETACH DELETE n")
+result = session.run(query)
+print("All Nodes and relationships are deleted!")
