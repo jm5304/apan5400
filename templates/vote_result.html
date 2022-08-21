@@ -1,0 +1,27 @@
+<HTML>
+    <BODY bgcolor="#FFFFFF">
+     {% if search_results %} 
+      <table border -1 >
+         {% for i in vote_results %}
+            <tr>
+                <td> {{i.id}} </td>
+                <td> {{i.title}} </td>
+                <td> {{i.average_rating}} </td>
+                <td> {{i.num_votes}} </td>
+                
+
+            </tr>  
+
+         {% endfor %}
+
+     </table>  
+    
+     {% else %}
+     <p style="font-family:verdanna;">NO RESULTS FOUND</p>  
+     {% endif %}  
+     <h1>
+    
+    </h1>
+    
+    </BODY>
+</HTML>
