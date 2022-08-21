@@ -76,8 +76,8 @@ def s_by_Type_vote():
     num_vote='''
                        SELECT id, title, start_year, average_rating, num_votes, crime
     FROM movies
-    WHERE num_votes>%s
-    ''' % (request.form.get('vote'))###提取name，用这个% 
+    WHERE num_votes> %d
+    ''' % (request.form.get('vote')) 
     cur.execute(num_vote)
     result_df = pd.DataFrame(cur.fetchall(),columns=['id','title','start_year','average_rating','num_votes'])
     return render_template('vote_result.html', result=result_df.to_html(header = True))
@@ -87,6 +87,6 @@ def s_by_Type_vote():
 
 if __name__ == '__main__':
     
-    app.run(host='localhost',port=54321, debug=True)
+    app.run(host='localhost',port=54321)
 
 
